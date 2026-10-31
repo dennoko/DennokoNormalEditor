@@ -1,0 +1,280 @@
+{
+  "entries": [
+    {
+      "key": "inspector.targets_header",
+      "ja": "編集対象（複数指定で境界なじませ対応）",
+      "en": "Targets (Multi-mesh seam smoothing supported)"
+    },
+    {
+      "key": "inspector.vertex_count",
+      "ja": "{0} 頂点",
+      "en": "{0} verts"
+    },
+    {
+      "key": "inspector.add_target",
+      "ja": "対象を追加",
+      "en": "Add Target"
+    },
+    {
+      "key": "inspector.add_target_tooltip",
+      "ja": "編集したいメッシュを持つオブジェクト（頭と体など複数可）をここへドラッグ＆ドロップすると、編集対象に追加されます。",
+      "en": "Drag GameObjects with meshes you want to edit (e.g., Head and Body) here to add them as targets."
+    },
+    {
+      "key": "inspector.add_target_prompt",
+      "ja": "「対象を追加」の枠へ、編集したいメッシュを持つオブジェクトをドラッグ＆ドロップしてください。",
+      "en": "Drag a GameObject with the mesh you want to edit into the \"Add Target\" field."
+    },
+    {
+      "key": "inspector.warn_no_mesh",
+      "ja": "この Renderer にメッシュが設定されていません。",
+      "en": "No mesh is assigned to this Renderer."
+    },
+    {
+      "key": "inspector.warn_vertex_count_mismatch",
+      "ja": "頂点数が編集時と異なります（現在 {0} / 編集時 {1}）。編集は適用されません。",
+      "en": "Vertex count differs from when edited (Current: {0} / Edited: {1}). Edits will not be applied."
+    },
+    {
+      "key": "inspector.btn_edit_end",
+      "ja": "編集終了",
+      "en": "Finish Editing"
+    },
+    {
+      "key": "inspector.btn_edit_start",
+      "ja": "編集",
+      "en": "Edit"
+    },
+    {
+      "key": "inspector.edit_help",
+      "ja": "シーンビューで頂点をクリックして範囲を選択し、3Dハンドルで法線を傾けるか、右下パネルのスライダーで「なじませる」「形状を戻す」「揃える」等を適用します。\nEsc で選択解除、もう一度 Esc で編集終了。",
+      "en": "Click a vertex in Scene View to select an area, drag the 3D handle to tilt normals, or use the overlay sliders for Smooth, Restore Shape, Flatten, etc.\nEsc to deselect, Esc again to finish."
+    },
+    {
+      "key": "inspector.warn_ndmf_vertex_mismatch",
+      "ja": "他の NDMF ツールがメッシュの頂点数を変更しているため、変更前の形状を基準に編集しています。",
+      "en": "Another NDMF tool modified the vertex count. Editing based on the original mesh shape."
+    },
+    {
+      "key": "inspector.warn_ndmf_fallback",
+      "ja": "NDMF プレビューのプロキシを取得できていません。NDMF のプレビューが有効になっているか確認してください。",
+      "en": "Could not acquire NDMF preview proxy. Please check if NDMF preview is enabled."
+    },
+    {
+      "key": "inspector.brush_header",
+      "ja": "ブラシ設定",
+      "en": "Brush Settings"
+    },
+    {
+      "key": "inspector.brush_radius",
+      "ja": "半径",
+      "en": "Radius"
+    },
+    {
+      "key": "inspector.brush_radius_tooltip",
+      "ja": "プロポーショナル編集の影響半径（ワールド単位）",
+      "en": "Influence radius for proportional editing (world units)"
+    },
+    {
+      "key": "inspector.brush_falloff",
+      "ja": "減衰",
+      "en": "Falloff"
+    },
+    {
+      "key": "inspector.mirror_on",
+      "ja": "ミラー: 有効 (ON)",
+      "en": "Mirror: Enabled (ON)"
+    },
+    {
+      "key": "inspector.mirror_off",
+      "ja": "ミラー: 無効 (OFF)",
+      "en": "Mirror: Disabled (OFF)"
+    },
+    {
+      "key": "inspector.mirror_axis",
+      "ja": "ミラー軸",
+      "en": "Mirror Axis"
+    },
+    {
+      "key": "inspector.axis_x",
+      "ja": "X 軸",
+      "en": "X Axis"
+    },
+    {
+      "key": "inspector.axis_x_tooltip",
+      "ja": "X 軸（左右対称）",
+      "en": "X Axis (Left/Right)"
+    },
+    {
+      "key": "inspector.axis_y",
+      "ja": "Y 軸",
+      "en": "Y Axis"
+    },
+    {
+      "key": "inspector.axis_y_tooltip",
+      "ja": "Y 軸（上下対称）",
+      "en": "Y Axis (Up/Down)"
+    },
+    {
+      "key": "inspector.axis_z",
+      "ja": "Z 軸",
+      "en": "Z Axis"
+    },
+    {
+      "key": "inspector.axis_z_tooltip",
+      "ja": "Z 軸（前後対称）",
+      "en": "Z Axis (Front/Back)"
+    },
+    {
+      "key": "inspector.transfer_header",
+      "ja": "一括球面化・法線転写",
+      "en": "Batch Spherize & Normal Transfer"
+    },
+    {
+      "key": "inspector.transfer_source",
+      "ja": "転写元メッシュ",
+      "en": "Transfer Source"
+    },
+    {
+      "key": "inspector.transfer_source_tooltip",
+      "ja": "球体プロキシや転写元の Renderer を指定します",
+      "en": "Specify a sphere proxy or source Renderer to transfer normals from"
+    },
+    {
+      "key": "inspector.spherize_center",
+      "ja": "球面化の中心",
+      "en": "Spherize Center"
+    },
+    {
+      "key": "inspector.spherize_center_tooltip",
+      "ja": "Head ボーン等を指定するとそこを中心に放射状の球面法線を生成します（空欄時は自動中心）",
+      "en": "Specify Head bone etc. as the radial center for spherizing normals (auto center if empty)"
+    },
+    {
+      "key": "inspector.btn_transfer_all",
+      "ja": "転写元から法線を転写",
+      "en": "Transfer from Source"
+    },
+    {
+      "key": "inspector.btn_spherize_all",
+      "ja": "対象を球面法線化",
+      "en": "Spherize Targets"
+    },
+    {
+      "key": "inspector.bake_header",
+      "ja": "ベイク",
+      "en": "Bake"
+    },
+    {
+      "key": "inspector.bake_help",
+      "ja": "元メッシュと同じフォルダに _edited を付けた名前で書き出します。シーン内の Renderer は差し替えません。",
+      "en": "Exports to the same folder as original mesh with '_edited' suffix. Scene Renderers will not be replaced."
+    },
+    {
+      "key": "inspector.btn_bake",
+      "ja": "ベイク",
+      "en": "Bake"
+    },
+    {
+      "key": "inspector.btn_clear_all",
+      "ja": "すべての編集をクリア",
+      "en": "Clear All Edits"
+    },
+    {
+      "key": "inspector.dialog_clear_title",
+      "ja": "Dennoko Normal Editor",
+      "en": "Dennoko Normal Editor"
+    },
+    {
+      "key": "inspector.dialog_clear_message",
+      "ja": "すべての法線編集内容を破棄します。よろしいですか？",
+      "en": "Discard all normal edit contents. Are you sure?"
+    },
+    {
+      "key": "inspector.dialog_clear_ok",
+      "ja": "クリア",
+      "en": "Clear"
+    },
+    {
+      "key": "inspector.dialog_clear_cancel",
+      "ja": "キャンセル",
+      "en": "Cancel"
+    },
+    {
+      "key": "overlay.title",
+      "ja": "Dennoko Normal Editor — 編集中",
+      "en": "Dennoko Normal Editor — Editing"
+    },
+    {
+      "key": "overlay.radius",
+      "ja": "半径",
+      "en": "Radius"
+    },
+    {
+      "key": "overlay.falloff",
+      "ja": "減衰",
+      "en": "Falloff"
+    },
+    {
+      "key": "overlay.mirror_on",
+      "ja": "ミラー: 有効 (ON)",
+      "en": "Mirror: Enabled (ON)"
+    },
+    {
+      "key": "overlay.mirror_off",
+      "ja": "ミラー: 無効 (OFF)",
+      "en": "Mirror: Disabled (OFF)"
+    },
+    {
+      "key": "overlay.effects_header",
+      "ja": "選択範囲の法線調整（スライダーで適用）",
+      "en": "Selected Area Adjustments"
+    },
+    {
+      "key": "overlay.effect_smooth",
+      "ja": "なじませる",
+      "en": "Smooth"
+    },
+    {
+      "key": "overlay.effect_restore_shape",
+      "ja": "形状を戻す",
+      "en": "Shape"
+    },
+    {
+      "key": "overlay.effect_flatten",
+      "ja": "揃える",
+      "en": "Flatten"
+    },
+    {
+      "key": "overlay.effect_spherize",
+      "ja": "球面化",
+      "en": "Spherize"
+    },
+    {
+      "key": "overlay.effect_erase",
+      "ja": "元に戻す",
+      "en": "Erase"
+    },
+    {
+      "key": "overlay.no_selection_prompt",
+      "ja": "頂点をクリックすると範囲選択＆調整できます",
+      "en": "Click a vertex to select area & adjust"
+    },
+    {
+      "key": "overlay.hint_wheel",
+      "ja": "※ 3Dハンドルで傾ける / ホイールで半径変更",
+      "en": "※ Drag 3D handle to tilt / Wheel to resize"
+    },
+    {
+      "key": "overlay.hint_esc",
+      "ja": "※ Escキーで編集終了（選択中は選択解除）",
+      "en": "※ Esc to finish editing (deselects if selected)"
+    },
+    {
+      "key": "overlay.warn_ndmf_fallback",
+      "ja": "NDMF プレビュー未取得。他ツールの影響は反映されていません。",
+      "en": "NDMF preview not acquired. Other tool effects are not reflected."
+    }
+  ]
+}
+

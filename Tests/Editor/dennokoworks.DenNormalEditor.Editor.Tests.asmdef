@@ -1,0 +1,26 @@
+{
+    "name": "dennokoworks.DenNormalEditor.Editor.Tests",
+    "rootNamespace": "Dennokoworks.DenNormalEditor.Tests",
+    "references": [
+        "dennokoworks.DenNormalEditor.Runtime",
+        "dennokoworks.DenNormalEditor.Editor",
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
+

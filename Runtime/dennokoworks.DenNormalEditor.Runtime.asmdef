@@ -1,0 +1,23 @@
+{
+    "name": "dennokoworks.DenNormalEditor.Runtime",
+    "rootNamespace": "Dennokoworks.DenNormalEditor",
+    "references": [
+        "VRC.SDKBase"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.vrchat.base",
+            "expression": "",
+            "define": "DEN_NORMAL_EDITOR_VRCSDK"
+        }
+    ],
+    "noEngineReferences": false
+}
+
