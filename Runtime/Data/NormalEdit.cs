@@ -35,6 +35,15 @@ namespace Dennokoworks.DenNormalEditor
         [Tooltip("編集時点の頂点数。適用前の整合性チェックに使用します。")]
         public int vertexCount;
 
+        /// <summary>
+        /// UV0 上の明るさで、この対象へのシーン上の編集の強度を調整するマスク（白 = 100%、黒 = 0%）。
+        ///
+        /// 操作の時点でデルタへ焼き込まれるだけで、プレビュー・ビルドの適用には関与しない。
+        /// そのため <see cref="revision"/> を進めず、NDMF の監視対象にも含めない。
+        /// </summary>
+        [Tooltip("UV0 上の明るさで、この対象への編集の強度を調整します（白 = 100%、黒 = 0%）。シーン上の操作にのみ効きます。")]
+        public Texture2D strengthMask;
+
         [SerializeField, HideInInspector] private int count;
         [SerializeField, HideInInspector] private byte[] blob;
 

@@ -288,7 +288,14 @@ namespace Dennokoworks.DenNormalEditor.Editor
 
                 EditorGUILayout.EndHorizontal();
 
-                DrawTargetWarning(targetProp, vertexCountProp);
+                var maskProp = element.FindPropertyRelative("strengthMask");
+                EditorGUI.indentLevel++;
+                EditorGUILayout.PropertyField(maskProp, new GUIContent(
+                    DenNormalEditorLocalization.Tr("inspector.mask"),
+                    DenNormalEditorLocalization.Tr("inspector.mask_tooltip")));
+                EditorGUI.indentLevel--;
+
+                DrawTargetWarning(targetProp, vertexCountProp, maskProp);
             }
 
             if (removeAt >= 0)
@@ -402,7 +409,8 @@ namespace Dennokoworks.DenNormalEditor.Editor
             serializedObject.Update();
         }
 
-        private static void DrawTargetWarning(SerializedProperty targetProp, SerializedProperty vertexCountProp)
+        private static void DrawTargetWarning(SerializedProperty targetProp, SerializedProperty vertexCountProp,
+            SerializedProperty maskProp)
         {
             var renderer = targetProp.objectReferenceValue as Renderer;
             if (renderer == null) return;
@@ -420,6 +428,11 @@ namespace Dennokoworks.DenNormalEditor.Editor
                 EditorGUILayout.HelpBox(
                     DenNormalEditorLocalization.Format("inspector.warn_vertex_count_mismatch", mesh.vertexCount, recorded),
                     MessageType.Error);
+            }
+
+            if (maskProp.objectReferenceValue != null && !StrengthMaskUtil.HasUV0(mesh))
+            {
+                EditorGUILayout.HelpBox(DenNormalEditorLocalization.Tr("inspector.mask_no_uv"), MessageType.Warning);
             }
         }
 

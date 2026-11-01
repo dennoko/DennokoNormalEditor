@@ -201,6 +201,21 @@
       "en": "Cancel"
     },
     {
+      "key": "inspector.mask",
+      "ja": "マスク",
+      "en": "Mask"
+    },
+    {
+      "key": "inspector.mask_tooltip",
+      "ja": "UV0 上の明るさで、この対象への編集の強度を調整します（白 = 100%、黒 = 0%）。シーン上の操作（傾け・なじませる等）にのみ効き、一括処理（転写・球面化）には効きません。",
+      "en": "Scales edit strength on this target by brightness in UV0 (white = 100%, black = 0%). Applies only to Scene View operations (tilt, smooth, etc.), not to batch transfer / spherize."
+    },
+    {
+      "key": "inspector.mask_no_uv",
+      "ja": "このメッシュには UV0 が無いため、マスクは使われません。",
+      "en": "This mesh has no UV0, so the mask is ignored."
+    },
+    {
       "key": "overlay.title",
       "ja": "Dennoko Normal Editor — 編集中",
       "en": "Dennoko Normal Editor — Editing"

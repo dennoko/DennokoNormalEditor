@@ -127,6 +127,7 @@ namespace Dennokoworks.DenNormalEditor.Editor
         private void BuildInfluences()
         {
             _influences.Clear();
+            RebuildMaskIfNeeded();
 
             var radius = Mathf.Max(1e-5f, BrushRadius);
             var radiusSq = radius * radius;
@@ -172,6 +173,13 @@ namespace Dennokoworks.DenNormalEditor.Editor
                     }
 
                     if (weight <= 0f && mirrorWeight <= 0f) continue;
+
+                    // 強度マスク。Tilt・全エフェクトはこの重みだけを読むので、ここで掛ければ全操作に効く。
+                    // 鏡像側もその頂点自身の UV のマスクを使う
+                    var mask = MaskAt(target, i);
+                    if (mask <= 0f) continue;
+                    weight *= mask;
+                    mirrorWeight *= mask;
 
                     var skin = SkinMatrix(target, i);
                     _influences.Add(new Influence

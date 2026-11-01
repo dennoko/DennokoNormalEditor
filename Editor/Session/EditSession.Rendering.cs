@@ -115,10 +115,14 @@ namespace Dennokoworks.DenNormalEditor.Editor
                     var dSq = (vertices[i] - hovered).sqrMagnitude;
                     if (dSq >= radiusSq) continue;
 
+                    // マスクで効かない頂点はピンを出さない（クリック前に効く範囲が分かるようにする）
+                    var mask = MaskAt(target, i);
+                    if (mask <= 0f) continue;
+
                     if (++drawn > MaxDrawnVertices) break;
 
                     var t = Mathf.Sqrt(dSq) * inverseRadius;
-                    var w = FalloffUtil.Weight(t, _component.falloff);
+                    var w = FalloffUtil.Weight(t, _component.falloff) * mask;
                     Handles.color = new Color(0.3f, 0.85f, 1f, Mathf.Lerp(0.15f, 0.65f, w));
 
                     var pos = vertices[i];

@@ -32,6 +32,16 @@ namespace Dennokoworks.DenNormalEditor.Editor
 
             public NormalEdit Edit;
 
+            // 強度マスク（EditSession.Mask.cs）
+            public Texture2D MaskSource;
+            public Hash128 MaskHash;
+
+            /// <summary>この対象自身の UV0 から求めたマスク値。null は未指定（= 100%）。</summary>
+            public float[] VertexMask;
+
+            /// <summary>結合グループ内の最小値を取った最終的なマスク値。null は全頂点 100%。</summary>
+            public float[] Mask;
+
             public readonly List<Vector3> LocalVertices = new List<Vector3>();
             public readonly List<Vector3> LocalNormalsScratch = new List<Vector3>();
             public readonly List<int> Triangles = new List<int>();
@@ -139,6 +149,7 @@ namespace Dennokoworks.DenNormalEditor.Editor
 
             _targets.Clear();
             _crossTopology = null;
+            _maskDirty = true;
             _screenCacheValid = false;
             _gridCacheValid = false;
         }
@@ -223,6 +234,11 @@ namespace Dennokoworks.DenNormalEditor.Editor
             if (geometryChanged || _crossTopology == null)
             {
                 RebuildCrossMeshTopology();
+
+                // グループ構成と UV の読み元が変わりうるので、マスクは全対象を計算し直す
+                // （実際の計算は直後の BuildInfluences か、Refresh 末尾で行われる）
+                _maskDirty = true;
+
                 foreach (var target in _targets)
                 {
                     UpdateTargetWorldNormals(target);
@@ -239,6 +255,13 @@ namespace Dennokoworks.DenNormalEditor.Editor
                 {
                     _geometryGeneration++;
                 }
+            }
+
+            // マスクの差し替え（Inspector・Undo）や外部での再インポートを拾う。
+            // ホバー表示もこの値を使うので、選択の有無にかかわらず更新する
+            if (RebuildMaskIfNeeded() && _hasSelection)
+            {
+                BuildInfluences();
             }
 
             AnyFallback = anyFallback;
