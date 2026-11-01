@@ -32,16 +32,16 @@ namespace Dennokoworks.DenNormalEditor.Editor
 
             // ドラッグ操作中はピンの不透明度を下げて lilToon 等のシェーディング境界を見やすくする
             var activelyAdjusting = _dragging || _activeEffectMode != EffectMode.None;
-            var alphaMultiplier = activelyAdjusting ? 0.25f : 1f;
+            var alphaMultiplier = activelyAdjusting ? 0.45f : 1f;
 
-            DrawBrushCircle(_centerWorld, new Color(0.3f, 0.8f, 1f, 0.8f * alphaMultiplier));
+            DrawBrushCircle(_centerWorld, new Color(0.2f, 0.7f, 1f, 0.85f * alphaMultiplier));
             if (_mirrorActive)
             {
-                DrawBrushCircle(_mirrorCenterWorld, new Color(1f, 0.4f, 0.6f, 0.8f * alphaMultiplier));
+                DrawBrushCircle(_mirrorCenterWorld, new Color(1f, 0.35f, 0.55f, 0.85f * alphaMultiplier));
             }
 
             // 選択頂点から 3D ハンドルへのガイドライン
-            Handles.color = new Color(1f, 0.9f, 0.2f, 0.9f);
+            Handles.color = new Color(1f, 0.9f, 0.2f, 0.95f);
             Handles.DrawLine(_centerWorld, _handlePosition);
 
             BeginOccludedVertexCulling(out var previousZTest);
@@ -63,8 +63,8 @@ namespace Dennokoworks.DenNormalEditor.Editor
 
                 var strength = Mathf.Clamp01(influence.Weight + influence.MirrorWeight);
                 var baseColor = Color.Lerp(
-                    new Color(0.2f, 0.65f, 1f, 0.35f),
-                    new Color(1f, 0.35f, 0.3f, 0.9f),
+                    new Color(0.15f, 0.55f, 1f, 0.65f),
+                    new Color(1f, 0.25f, 0.2f, 0.98f),
                     strength);
                 baseColor.a *= alphaMultiplier;
 
@@ -123,7 +123,7 @@ namespace Dennokoworks.DenNormalEditor.Editor
 
                     var t = Mathf.Sqrt(dSq) * inverseRadius;
                     var w = FalloffUtil.Weight(t, _component.falloff) * mask;
-                    Handles.color = new Color(0.3f, 0.85f, 1f, Mathf.Lerp(0.15f, 0.65f, w));
+                    Handles.color = new Color(0.15f, 0.6f, 1f, Mathf.Lerp(0.4f, 0.9f, w));
 
                     var pos = vertices[i];
                     Handles.DrawLine(pos, pos + normals[i] * pinLen);
