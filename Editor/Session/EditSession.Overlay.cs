@@ -34,7 +34,7 @@ namespace Dennokoworks.DenNormalEditor.Editor
             }
 
             var current = Event.current;
-            var overlayHeight = _overlayShowsWarning ? 355f : 315f;
+            var overlayHeight = _overlayShowsWarning ? 288f : 248f;
             var overlayWidth = 340f;
             const float margin = 10f;
 

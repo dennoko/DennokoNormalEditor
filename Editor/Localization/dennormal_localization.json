@@ -249,6 +249,36 @@
       "key": "overlay.warn_ndmf_fallback",
       "ja": "NDMF プレビュー未取得。他ツールの影響は反映されていません。",
       "en": "NDMF preview not acquired. Other tool effects are not reflected."
+    },
+    {
+      "key": "version.update_available",
+      "ja": "更新あり {0} ↗",
+      "en": "Update available {0} ↗"
+    },
+    {
+      "key": "version.update_tooltip",
+      "ja": "クリックでダウンロードページを開きます",
+      "en": "Click to open download page"
+    },
+    {
+      "key": "version.error",
+      "ja": "最新版を取得できません",
+      "en": "Failed to check update"
+    },
+    {
+      "key": "version.error_tooltip",
+      "ja": "↻ ボタンで再確認できます",
+      "en": "Click ↻ to recheck"
+    },
+    {
+      "key": "version.checking",
+      "ja": "確認中...",
+      "en": "Checking..."
+    },
+    {
+      "key": "version.recheck_tooltip",
+      "ja": "アップデートを再確認",
+      "en": "Recheck update"
     }
   ]
 }

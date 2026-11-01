@@ -14,6 +14,9 @@ namespace Dennokoworks.DenNormalEditor.Editor
         private SerializedProperty _mirror;
         private SerializedProperty _mirrorAxis;
 
+        private DennokoVersionChecker.Result _versionResult;
+        private static GUIStyle _versionLinkStyle;
+
         private static bool _menuHandled;
 
         [MenuItem("GameObject/dennokoworks/Dennoko Normal Editor", false, 21)]
@@ -201,6 +204,12 @@ namespace Dennokoworks.DenNormalEditor.Editor
             _mirrorAxis = serializedObject.FindProperty("mirrorAxis");
 
             DenNormalEditorLocalization.OnLanguageChanged += OnLanguageChanged;
+
+            // 前回の取得結果を反映しつつ、未取得／前回エラーなら取得を開始する
+            //（要否の判定は StartCheckBackgroundTask 内で行う）。Inspector を選び直す
+            // たびに一時的な取得失敗から自己回復できる。
+            ReloadVersionResult();
+            DenNormalEditorVersion.StartCheckBackgroundTask();
         }
 
         private void OnDisable()
@@ -210,6 +219,13 @@ namespace Dennokoworks.DenNormalEditor.Editor
 
         private void OnLanguageChanged()
         {
+            Repaint();
+        }
+
+        /// <summary>取得完了時に <see cref="DenNormalEditorVersion"/> から呼ばれる。</summary>
+        internal void ReloadVersionResult()
+        {
+            _versionResult = DenNormalEditorVersion.LoadResultFromSessionState();
             Repaint();
         }
 
@@ -223,7 +239,7 @@ namespace Dennokoworks.DenNormalEditor.Editor
             var component = (DenNormalEditor)target;
             serializedObject.Update();
 
-            DrawHeaderBar();
+            DrawVersionBar();
             EditorGUILayout.Space();
             DrawTargets();
             EditorGUILayout.Space();
@@ -239,10 +255,68 @@ namespace Dennokoworks.DenNormalEditor.Editor
             }
         }
 
-        private static void DrawHeaderBar()
+        private void DrawVersionBar()
         {
+            if (_versionLinkStyle == null)
+            {
+                _versionLinkStyle = new GUIStyle(EditorStyles.miniLabel);
+            }
+
+            var prevColor = GUI.contentColor;
+
             EditorGUILayout.BeginHorizontal();
+
+            GUI.contentColor = new Color(0.68f, 0.68f, 0.68f);
+            GUILayout.Label($"v{_versionResult.LocalVersion}", EditorStyles.miniLabel, GUILayout.ExpandWidth(false));
+            GUI.contentColor = prevColor;
+
+            switch (_versionResult.State)
+            {
+                case DennokoVersionChecker.State.UpdateAvailable:
+                {
+                    var tooltip = string.IsNullOrEmpty(_versionResult.Message)
+                        ? DenNormalEditorLocalization.Tr("version.update_tooltip")
+                        : _versionResult.Message;
+
+                    GUI.contentColor = new Color(0.35f, 0.8f, 0.4f);
+                    var clicked = GUILayout.Button(
+                        new GUIContent(DenNormalEditorLocalization.Format("version.update_available", _versionResult.LatestVersion), tooltip),
+                        _versionLinkStyle, GUILayout.ExpandWidth(false));
+                    GUI.contentColor = prevColor;
+
+                    EditorGUIUtility.AddCursorRect(GUILayoutUtility.GetLastRect(), MouseCursor.Link);
+                    if (clicked)
+                    {
+                        DenNormalEditorVersion.OpenUpdatePage(_versionResult.Url);
+                    }
+                    break;
+                }
+
+                case DennokoVersionChecker.State.Error:
+                    GUI.contentColor = new Color(1f, 0.72f, 0.3f);
+                    GUILayout.Label(
+                        new GUIContent(DenNormalEditorLocalization.Tr("version.error"), DenNormalEditorLocalization.Tr("version.error_tooltip")),
+                        EditorStyles.miniLabel, GUILayout.ExpandWidth(false));
+                    GUI.contentColor = prevColor;
+                    break;
+
+                case DennokoVersionChecker.State.Checking:
+                    GUI.contentColor = new Color(0.55f, 0.55f, 0.55f);
+                    GUILayout.Label(DenNormalEditorLocalization.Tr("version.checking"), EditorStyles.miniLabel, GUILayout.ExpandWidth(false));
+                    GUI.contentColor = prevColor;
+                    break;
+
+                default: // UpToDate — バージョン表記だけ
+                    break;
+            }
+
             GUILayout.FlexibleSpace();
+
+            if (GUILayout.Button(new GUIContent("↻", DenNormalEditorLocalization.Tr("version.recheck_tooltip")), EditorStyles.miniButton, GUILayout.Width(22)))
+            {
+                DenNormalEditorVersion.ForceRecheck();
+                ReloadVersionResult(); // 即座に「確認中...」表示へ
+            }
 
             if (GUILayout.Button(
                     new GUIContent(DenNormalEditorLocalization.ButtonText, DenNormalEditorLocalization.ButtonTooltip),

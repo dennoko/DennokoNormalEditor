@@ -248,5 +248,22 @@ namespace Dennokoworks.DenNormalEditor.Tests
             Assert.Greater(restored40.x, leftGeoNormal.x);
             Assert.Less(Mathf.Abs(restored40.magnitude - 1f), 1e-5f);
         }
+
+        [Test]
+        public void VersionChecker_IsUpdateAvailable_DetectsNewerVersionsCorrectly()
+        {
+            Assert.IsTrue(DennokoVersionChecker.IsUpdateAvailable("1.0.1", "1.0.0"));
+            Assert.IsTrue(DennokoVersionChecker.IsUpdateAvailable("v1.1.0", "1.0.0"));
+            Assert.IsTrue(DennokoVersionChecker.IsUpdateAvailable("2.0.0", "1.9.9"));
+            Assert.IsFalse(DennokoVersionChecker.IsUpdateAvailable("1.0.0", "1.0.0"));
+            Assert.IsFalse(DennokoVersionChecker.IsUpdateAvailable("v1.0.0", "1.0.0"));
+            Assert.IsFalse(DennokoVersionChecker.IsUpdateAvailable("0.9.9", "1.0.0"));
+        }
+
+        [Test]
+        public void DenNormalEditorVersion_Current_ReadsVersionJson()
+        {
+            Assert.AreEqual("1.0.0", DenNormalEditorVersion.Current);
+        }
     }
 }
