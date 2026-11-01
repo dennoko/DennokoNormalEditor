@@ -126,41 +126,6 @@
       "en": "Z Axis (Front/Back)"
     },
     {
-      "key": "inspector.transfer_header",
-      "ja": "一括球面化・法線転写",
-      "en": "Batch Spherize & Normal Transfer"
-    },
-    {
-      "key": "inspector.transfer_source",
-      "ja": "転写元メッシュ",
-      "en": "Transfer Source"
-    },
-    {
-      "key": "inspector.transfer_source_tooltip",
-      "ja": "球体プロキシや転写元の Renderer を指定します",
-      "en": "Specify a sphere proxy or source Renderer to transfer normals from"
-    },
-    {
-      "key": "inspector.spherize_center",
-      "ja": "球面化の中心",
-      "en": "Spherize Center"
-    },
-    {
-      "key": "inspector.spherize_center_tooltip",
-      "ja": "Head ボーン等を指定するとそこを中心に放射状の球面法線を生成します（空欄時は自動中心）",
-      "en": "Specify Head bone etc. as the radial center for spherizing normals (auto center if empty)"
-    },
-    {
-      "key": "inspector.btn_transfer_all",
-      "ja": "転写元から法線を転写",
-      "en": "Transfer from Source"
-    },
-    {
-      "key": "inspector.btn_spherize_all",
-      "ja": "対象を球面法線化",
-      "en": "Spherize Targets"
-    },
-    {
       "key": "inspector.bake_header",
       "ja": "ベイク",
       "en": "Bake"
@@ -207,8 +172,8 @@
     },
     {
       "key": "inspector.mask_tooltip",
-      "ja": "UV0 上の明るさで、この対象への編集の強度を調整します（白 = 100%、黒 = 0%）。シーン上の操作（傾け・なじませる等）にのみ効き、一括処理（転写・球面化）には効きません。",
-      "en": "Scales edit strength on this target by brightness in UV0 (white = 100%, black = 0%). Applies only to Scene View operations (tilt, smooth, etc.), not to batch transfer / spherize."
+      "ja": "UV0 上の明るさで、この対象への編集の強度を調整します（白 = 100%、黒 = 0%）。シーン上の操作（傾け・なじませる等）に効きます。",
+      "en": "Scales edit strength on this target by brightness in UV0 (white = 100%, black = 0%). Applies to Scene View operations (tilt, smooth, etc.)."
     },
     {
       "key": "inspector.mask_no_uv",
@@ -259,11 +224,6 @@
       "key": "overlay.effect_flatten",
       "ja": "揃える",
       "en": "Flatten"
-    },
-    {
-      "key": "overlay.effect_spherize",
-      "ja": "球面化",
-      "en": "Spherize"
     },
     {
       "key": "overlay.effect_erase",

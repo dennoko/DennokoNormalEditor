@@ -248,32 +248,5 @@ namespace Dennokoworks.DenNormalEditor.Tests
             Assert.Greater(restored40.x, leftGeoNormal.x);
             Assert.Less(Mathf.Abs(restored40.magnitude - 1f), 1e-5f);
         }
-
-        [Test]
-        public void NormalTransferUtil_SpherizeAndTransferClosestNormals_ProducesExpectedNormals()
-        {
-            var center = new Vector3(0f, 1f, 0f);
-            var vertex = new Vector3(1f, 1f, 0f);
-            var current = Vector3.forward;
-
-            // weight = 1 の球面化では中心から頂点への放射方向 (+X) になること
-            var spherized = NormalTransferUtil.ComputeSpherizedNormal(vertex, center, current, 1f);
-            Assert.Less((spherized - Vector3.right).magnitude, 1e-5f);
-
-            // 別メッシュからの最近傍法線転写
-            var srcVerts = new[] { new Vector3(0f, 0f, 0f), new Vector3(2f, 0f, 0f) };
-            var srcNormals = new[] { Vector3.up, Vector3.right };
-            var dstVerts = new[] { new Vector3(0.1f, 0f, 0f), new Vector3(1.9f, 0f, 0f) };
-            var dstCurrent = new[] { Vector3.forward, Vector3.forward };
-            var dstWeights = new[] { 1f, 0.5f };
-            var outNormals = new Vector3[2];
-
-            NormalTransferUtil.TransferClosestNormals(
-                srcVerts, srcNormals, dstVerts, dstCurrent, dstWeights, outNormals);
-
-            Assert.Less((outNormals[0] - Vector3.up).magnitude, 1e-5f);
-            var expectedHalf = new Vector3(1f, 0f, 1f).normalized;
-            Assert.Less((outNormals[1] - expectedHalf).magnitude, 1e-4f);
-        }
     }
 }

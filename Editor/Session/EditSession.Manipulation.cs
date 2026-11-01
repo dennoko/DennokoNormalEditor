@@ -11,12 +11,10 @@ namespace Dennokoworks.DenNormalEditor.Editor
             Smooth,
             RestoreShape,
             Flatten,
-            Spherize,
             Erase,
         }
 
         private Vector3 _selectedSnapshotNormal = Vector3.up;
-        private Vector3 _sphereAutoCenterWorld;
         private readonly List<Vector3[]> _snapshotNormalsList = new List<Vector3[]>();
 
         private Transform MirrorRoot
@@ -235,9 +233,6 @@ namespace Dennokoworks.DenNormalEditor.Editor
                     _snapshotNormalsList,
                     _crossTopology.SmoothedBufferA);
             }
-
-            // 球面化の自動中心（中心頂点から基準法線の逆方向へ半径分奥まった点）
-            _sphereAutoCenterWorld = _centerWorld - _selectedSnapshotNormal * Mathf.Max(BrushRadius, 0.05f);
         }
 
         /// <summary>
@@ -281,7 +276,7 @@ namespace Dennokoworks.DenNormalEditor.Editor
         }
 
         /// <summary>
-        /// オーバーレイのスライダー操作によるエフェクト（なじませる・形状を戻す・揃える・球面化・元に戻す）を適用する。
+        /// オーバーレイのスライダー操作によるエフェクト（なじませる・形状を戻す・揃える・元に戻す）を適用する。
         /// </summary>
         private void ApplyEffect(EffectMode mode, float strength)
         {
@@ -296,13 +291,6 @@ namespace Dennokoworks.DenNormalEditor.Editor
 
             var hasTopology = _crossTopology != null && _crossTopology.GroupCount > 0;
             var mirrorFlattenDir = _mirrorActive ? MirrorDirection(_selectedSnapshotNormal) : _selectedSnapshotNormal;
-            var sphereCenter = _component.spherizeCenter != null
-                ? _component.spherizeCenter.position
-                : _sphereAutoCenterWorld;
-            var mirrorSphereCenter = _mirrorActive
-                ? MirrorRoot.localToWorldMatrix.MultiplyPoint3x4(
-                    Reflect(MirrorRoot.worldToLocalMatrix.MultiplyPoint3x4(sphereCenter), _component.mirrorAxis))
-                : sphereCenter;
 
             foreach (var influence in _influences)
             {
@@ -361,26 +349,6 @@ namespace Dennokoworks.DenNormalEditor.Editor
                         {
                             newWorldNormal = SmoothNormalCalculator.SlerpNormal(
                                 newWorldNormal, mirrorFlattenDir, influence.MirrorWeight * strength);
-                        }
-                        break;
-                    }
-
-                    case EffectMode.Spherize:
-                    {
-                        var vertexWorld = hasTopology && influence.GroupId < _crossTopology.GroupPositions.Length
-                            ? _crossTopology.GroupPositions[influence.GroupId]
-                            : target.WorldVertices[idx];
-
-                        if (influence.Weight > 0f)
-                        {
-                            newWorldNormal = NormalTransferUtil.ComputeSpherizedNormal(
-                                vertexWorld, sphereCenter, newWorldNormal, influence.Weight * strength);
-                        }
-
-                        if (_mirrorActive && influence.MirrorWeight > 0f)
-                        {
-                            newWorldNormal = NormalTransferUtil.ComputeSpherizedNormal(
-                                vertexWorld, mirrorSphereCenter, newWorldNormal, influence.MirrorWeight * strength);
                         }
                         break;
                     }

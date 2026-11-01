@@ -15,7 +15,6 @@ namespace Dennokoworks.DenNormalEditor.Editor
         private float _smoothSlider;
         private float _restoreShapeSlider;
         private float _flattenSlider;
-        private float _spherizeSlider;
         private float _eraseSlider;
 
         private void ResetEffectSliders()
@@ -24,7 +23,6 @@ namespace Dennokoworks.DenNormalEditor.Editor
             _smoothSlider = 0f;
             _restoreShapeSlider = 0f;
             _flattenSlider = 0f;
-            _spherizeSlider = 0f;
             _eraseSlider = 0f;
         }
 
@@ -36,7 +34,7 @@ namespace Dennokoworks.DenNormalEditor.Editor
             }
 
             var current = Event.current;
-            var overlayHeight = _overlayShowsWarning ? 375f : 335f;
+            var overlayHeight = _overlayShowsWarning ? 355f : 315f;
             var overlayWidth = 340f;
             const float margin = 10f;
 
@@ -175,7 +173,6 @@ namespace Dennokoworks.DenNormalEditor.Editor
                 DrawEffectSlider(EffectMode.Smooth, "overlay.effect_smooth", ref _smoothSlider);
                 DrawEffectSlider(EffectMode.RestoreShape, "overlay.effect_restore_shape", ref _restoreShapeSlider);
                 DrawEffectSlider(EffectMode.Flatten, "overlay.effect_flatten", ref _flattenSlider);
-                DrawEffectSlider(EffectMode.Spherize, "overlay.effect_spherize", ref _spherizeSlider);
                 DrawEffectSlider(EffectMode.Erase, "overlay.effect_erase", ref _eraseSlider);
             }
 

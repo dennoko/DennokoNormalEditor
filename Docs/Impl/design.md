@@ -10,7 +10,7 @@
 | 方針 | 内容 |
 |---|---|
 | 既存コードの流用 | データ形式・NDMF 連携・Undo・セッションのライフサイクルは DME から移植する（型名の置換＋法線向けの差し替えのみ）。 |
-| 処理経路を 1 本にする | Tilt・オーバーレイの 5 エフェクト・Inspector の一括処理（転写・基準球面化）は、すべて同じ「**影響頂点リスト × 目標法線 × 強度 t**」の経路で処理する。 |
+| 処理経路を 1 本にする | Tilt・オーバーレイの 4 エフェクトは、すべて同じ「**影響頂点リスト × 目標法線 × 強度 t**」の経路で処理する。 |
 | 合成規則を 1 か所に置く | デルタの合成と適用は `GatherEditsInto` と `NormalDeltaApplier` にだけ書き、プレビュー・ビルド・ベイクの 3 経路で共有する。 |
 | 計算はワールド、保存はローカル | 操作・可視化・メッシュ間の合成はスキニング後のワールド空間で行い、保存するのはメッシュローカル空間のデルタだけにする。 |
 | 最適化は計測してから | ピッキングや範囲検索は総当たりで実装する。遅いと分かった箇所だけ DME の高速化コードを移植する（§10）。 |
@@ -50,7 +50,6 @@ DennokoNormalEditor/
     │   ├── SkinningUtil.cs               # スキニング行列・ローカル⇔ワールド変換
     │   ├── WeldGraph.cs                  # 複数メッシュ横断の結合グループ・隣接
     │   ├── SmoothNormalCalculator.cs     # スムーズ形状法線
-    │   ├── NormalTransferUtil.cs         # 球面化中心・最近傍転写
     │   ├── FalloffUtil.cs
     │   ├── DenNormalEditorBaker.cs       # Mesh アセット書き出し
     │   └── DenNormalEditorUndo.cs        # DME からそのまま移植
@@ -79,7 +78,7 @@ DennokoNormalEditor/
 
 - 名前空間：`Dennokoworks.DenNormalEditor`（Runtime）と `Dennokoworks.DenNormalEditor.Editor`（Editor）。
 - asmdef は DME の構成をそのまま使う。参照は `VRC.SDKBase`、`nadena.dev.ndmf`、`nadena.dev.ndmf.runtime`。versionDefine として `com.vrchat.base` → `DEN_NORMAL_EDITOR_VRCSDK` を定義する。
-- 要件 5.3 との差分：`SmoothNormalCalculator` に入れる予定だった Weld と隣接の構築を `WeldGraph.cs` へ分けた。Smooth・Restore・転写のすべてが使うためである。スキニング計算は、セッションと一括処理で共有するため `SkinningUtil.cs` へ切り出した。
+- 要件 5.3 との差分：`SmoothNormalCalculator` に入れる予定だった Weld と隣接の構築を `WeldGraph.cs` へ分けた。Smooth・Restore の両方が使うためである。スキニング計算は、セッションと Baker で共有するため `SkinningUtil.cs` へ切り出した。
 
 ---
 
@@ -106,8 +105,6 @@ public class DenNormalEditor : MonoBehaviour
     public NormalEdit FindEdit(Renderer target);
 }
 ```
-
-転写元 Renderer や球面化の基準 Transform のような一括処理のパラメータは、**シリアライズしない**。Inspector の一時状態として持つ。プレビュー結果に影響しない値をコンポーネントへ置くと、監視対象とシーン YAML が無駄に増えるためである。
 
 ### 2.2 `NormalEdit`
 
@@ -265,23 +262,7 @@ internal static Vector3[][] Compute(WeldGraph graph, IReadOnlyList<WeldInput> in
 
 ローカル空間で持つのは、セッション中にボーンが動いても、使う時点のポーズでワールドへ戻せばそのまま使えるからである。
 
-### 3.5 `NormalTransferUtil`（要件 3.3）
-
-```csharp
-// 転写元：ワールド座標とワールド法線の組。最近傍「頂点」探索用のグリッドを持つ
-internal sealed class TransferSource
-{
-    public static TransferSource FromRenderer(Renderer r);   // BakeMesh → ワールド化
-    public Vector3 NearestNormal(Vector3 worldPos);          // グリッド探索（見つからなければ周囲へ広げる）
-}
-internal static Vector3 SpherizeNormal(Vector3 worldPos, Vector3 center)
-    => (worldPos - center).normalized;
-```
-
-- 最近傍は「頂点」で取る（要件の「または頂点」を採用）。球体などの転写元は十分に細かいことが多いので、面上の最近点までは求めない。
-- グリッドのセル幅は、転写元のバウンズ対角長 / 64 とする。
-
-### 3.6 `DenNormalEditorUndo` / `DenNormalEditorBaker`
+### 3.5 `DenNormalEditorUndo` / `DenNormalEditorBaker`
 
 - Undo：DME の `DenMeshEditorUndo` をそのまま移植する（`BeginGroup` / `Apply` / `EndGroup` / `Collapse`）。
 - Baker：各対象について `GatherEdits` → `CreateEdited` を行い、`<元メッシュ名>_normal.asset` を元メッシュと同じフォルダ（読み取り専用なら `Assets/`）へ保存する。保存したアセットを Renderer へ割り当てるかは確認ダイアログで選ばせる。**FBX は書き換えない。**
@@ -489,7 +470,7 @@ foreach target, i:
 - 鏡像変換：`R(v) = root.TransformDirection(Reflect(root.InverseTransformDirection(v), axis))`
 - 結合グループに属する頂点同士は（メッシュをまたいでも）同じ位置にあるので、自然に同じ重みを受け取る。グループを特別扱いする処理は要らない（要件 4.1-2）。
 
-**目標法線を書き込む共通処理**（Tilt・エフェクト・一括処理のすべてがここを通る）：
+**目標法線を書き込む共通処理**（Tilt・エフェクトのすべてがここを通る）：
 
 ```csharp
 void WriteResult(in Influence inf, Vector3 resultWorld)
@@ -530,7 +511,7 @@ PublishWorking()
 すべてのエフェクトは「操作開始時に影響頂点ごとの `TargetWorld` を 1 回だけ計算し、強度 t のたびに補間するだけ」という同じ形で処理する。
 
 ```csharp
-enum Effect { Smooth, RestoreShape, Flatten, Spherize, Erase }
+enum Effect { Smooth, RestoreShape, Flatten, Erase }
 
 void BeginEffect(Effect e)     // スライダーを掴んだ瞬間、またはボタンを押したとき
 {
@@ -554,7 +535,6 @@ void EndEffect() => Commit();  // スライダーを離したとき。スライ�
 | Smooth | `normalize(GN(g) + mean(GN(h) for h in Neighbors(g)))` | 同じ（対称） |
 | RestoreShape | `LocalToWorldNormal(Skin, SmoothGeoLocal[i])` | 同じ |
 | Flatten | `_centerSnap`（選択中心頂点の法線） | `R(_centerSnap)` |
-| Spherize | `normalize(p − c)`、`c = centerPos − _centerSnap * R` | `c` の代わりに `R(c)` を中心にする |
 | Erase | `LocalToWorldNormal(Skin, BaseLocalN[i])` | 同じ |
 
 - `GN(g)` はグループ法線で、`normalize(Σ CurrentWorld(m) for m in Members(g))`（Snapshot 基準）。`BeginEffect` の中で `Dictionary<int, Vector3>` にメモ化し、影響範囲のグループとその隣接だけを計算する。範囲外の隣接グループ（別メッシュ側も含む）も読むので、境界をまたいでなじむ（要件 3.2 Smooth）。
@@ -598,7 +578,6 @@ DME の `DrawOverlay`（`Handles.BeginGUI` + 自前の矩形）を土台にす�
 │ [なじませる]   [|-----------] 0%          │
 │ [形状を戻す]   [|-----------] 0%          │
 │ [揃える]       [|-----------] 0%          │
-│ [球面化]       [|-----------] 0%          │
 │ [元に戻す]     [|-----------] 0%          │
 └──────────────────────────────────────── ┘
 ```
@@ -631,30 +610,9 @@ DME の `DrawOverlay`（`Handles.BeginGUI` + 自前の矩形）を土台にす�
   [ ここへドロップして追加 ]                  ← 複数同時ドロップに対応（DME から移植）
 ブラシ ───────────────────────────
   半径 / 減衰 / ミラー / ミラー軸
-一括処理 ▼（折りたたみ）─────────────
-  適用先  (●) 全体  ( ) 選択範囲
-  転写元 Renderer [        ]   [ 法線を転写 ]
-  球面化の中心   [ Transform ] (空ならバウンズ中心)  [ 球面化 ]
 ベイク ───────────────────────────
   [ Mesh アセットとして書き出し ]
 ```
-
-- 一括処理のボタンは、セッションが無ければ `EditSession.Begin` してから実行する。実行は `EditSession.Active.ApplyBulk(...)` を通すので、**エフェクトと同じ経路**になる。
-
-```csharp
-internal void ApplyBulk(Func<Influence, Vector3> target, bool selectionOnly)
-{
-    Snapshot ← Working;
-    if (selectionOnly) BuildInfluences(); else BuildAllInfluences(); // 全頂点、Weight = 1
-    foreach inf: WriteResult(inf, target(inf));
-    Commit();
-}
-// 転写:   src = TransferSource.FromRenderer(r);  inf => src.NearestNormal(Pos(inf))
-// 球面化: c = transform?.position ?? 全対象 WorldBounds の中心;  inf => SpherizeNormal(Pos(inf), c)
-```
-
-- 選択範囲が無い状態では「選択範囲」の選択肢を無効にする。
-- 転写元は、Inspector 上の一時的なフィールドとして持つ（§2.1）。
 
 ### 6.3 ローカライズ
 
@@ -722,8 +680,8 @@ AAO などの下流フィルタがメッシュを差し替える構成では、�
 | 1 | Runtime 一式、`NormalDeltaApplier`、`DenNormalEditorPlugin` | デバッグ用メニューで、全頂点に固定デルタを書き込む → Avatar をビルドして法線が変わること |
 | 2 | Preview 一式（DownstreamGuard を除く） | 1 と同じデータがシーンビューに反映されること。Inspector でクリアすると戻ること |
 | 3 | Session：対象の読み込み、レイキャスト、ピン、Tilt、Commit、Undo、Esc、Hierarchy メニュー | 顔の頂点を選んで傾け、Undo が 1 段で戻ること |
-| 4 | `WeldGraph`、`SmoothNormalCalculator`、オーバーレイの 5 エフェクト | Body と Face の首の継ぎ目に「なじませる」をかけて段差が消えること。球面法線の顔に「形状を戻す」をかけて鼻筋が出ること |
-| 5 | Inspector の一括処理（転写・球面化）、Baker、ローカライズ、`DownstreamGuard` | 球体からの転写 → 形状を戻す、までが単体で完結すること。AAO を併用してもプレビューされること |
+| 4 | `WeldGraph`、`SmoothNormalCalculator`、オーバーレイの 4 エフェクト | Body と Face の首の継ぎ目に「なじませる」をかけて段差が消えること。球面法線の顔に「形状を戻す」をかけて鼻筋が出ること |
+| 5 | Baker、ローカライズ、`DownstreamGuard` | ベイクしたメッシュに編集が反映されること。AAO を併用してもプレビューされること |
 
 ---
 
@@ -743,6 +701,5 @@ AAO などの下流フィルタがメッシュを差し替える構成では、�
 
 - ボーンに非一様スケールがある場合、ワールド法線の角度がわずかにずれる（§3.2）。往復は一貫しているので、誤差は溜まらない。
 - 結合はセッション開始時のポーズで判定する。セッション中に大きくポーズを変えても結合は作り直さない。
-- 転写は最近傍「頂点」で行う。転写元が極端に粗いメッシュだと、階段状になりうる。
 - 上流のツールが法線を in-place で書き換える場合、その変化は Source インスタンスが変わるまでプレビューに反映されない。
 - 頂点数か頂点順が変わったメッシュ（元メッシュの差し替えなど）では、編集を適用しない（ビルド時に警告する）。

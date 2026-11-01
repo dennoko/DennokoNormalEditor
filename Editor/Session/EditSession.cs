@@ -11,7 +11,7 @@ namespace Dennokoworks.DenNormalEditor.Editor
     ///
     /// 頂点をクリックして影響範囲（全登録 Renderer 対象）を選択し、
     /// 選択頂点上の常時 3D ハンドルで法線を傾けるか、オーバーレイのスライダーで
-    /// 「なじませる」「形状を戻す」「揃える」「球面化」「元に戻す」をリアルタイム適用する。
+    /// 「なじませる」「形状を戻す」「揃える」「元に戻す」をリアルタイム適用する。
     /// </summary>
     internal partial class EditSession
     {

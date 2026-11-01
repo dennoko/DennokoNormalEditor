@@ -32,13 +32,6 @@ namespace Dennokoworks.DenNormalEditor
 
         public MirrorAxis mirrorAxis = MirrorAxis.X;
 
-        [Header("法線転写・球面化補助")]
-        [Tooltip("法線転写元の Renderer（球体メッシュや別素体など）。")]
-        public Renderer transferSource;
-
-        [Tooltip("球面化の中心基準となる Transform（Head ボーン等）。未指定時は選択範囲またはメッシュ中心を使用します。")]
-        public Transform spherizeCenter;
-
         // Inspector ヘッダーに有効/無効チェックボックスを表示し、ワンクリックで Before/After 比較できるようにする
         private void OnEnable()
         {

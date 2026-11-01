@@ -13,8 +13,6 @@ namespace Dennokoworks.DenNormalEditor.Editor
         private SerializedProperty _falloff;
         private SerializedProperty _mirror;
         private SerializedProperty _mirrorAxis;
-        private SerializedProperty _transferSource;
-        private SerializedProperty _spherizeCenter;
 
         private static bool _menuHandled;
 
@@ -201,8 +199,6 @@ namespace Dennokoworks.DenNormalEditor.Editor
             _falloff = serializedObject.FindProperty("falloff");
             _mirror = serializedObject.FindProperty("mirror");
             _mirrorAxis = serializedObject.FindProperty("mirrorAxis");
-            _transferSource = serializedObject.FindProperty("transferSource");
-            _spherizeCenter = serializedObject.FindProperty("spherizeCenter");
 
             DenNormalEditorLocalization.OnLanguageChanged += OnLanguageChanged;
         }
@@ -234,8 +230,6 @@ namespace Dennokoworks.DenNormalEditor.Editor
             DrawEditControls(component);
             EditorGUILayout.Space();
             DrawBrushSettings();
-            EditorGUILayout.Space();
-            DrawTransferSection(component);
             EditorGUILayout.Space();
             DrawBakeSection(component);
 
@@ -553,121 +547,6 @@ namespace Dennokoworks.DenNormalEditor.Editor
 
             GUI.backgroundColor = defaultColor;
             EditorGUILayout.EndHorizontal();
-        }
-
-        private void DrawTransferSection(DenNormalEditor component)
-        {
-            EditorGUILayout.LabelField(DenNormalEditorLocalization.Tr("inspector.transfer_header"), EditorStyles.boldLabel);
-
-            EditorGUILayout.PropertyField(_transferSource,
-                new GUIContent(DenNormalEditorLocalization.Tr("inspector.transfer_source"), DenNormalEditorLocalization.Tr("inspector.transfer_source_tooltip")));
-            EditorGUILayout.PropertyField(_spherizeCenter,
-                new GUIContent(DenNormalEditorLocalization.Tr("inspector.spherize_center"), DenNormalEditorLocalization.Tr("inspector.spherize_center_tooltip")));
-
-            EditorGUILayout.BeginHorizontal();
-
-            using (new EditorGUI.DisabledScope(_edits.arraySize == 0 || _transferSource.objectReferenceValue == null))
-            {
-                if (GUILayout.Button(DenNormalEditorLocalization.Tr("inspector.btn_transfer_all"), GUILayout.Height(24)))
-                {
-                    serializedObject.ApplyModifiedProperties();
-                    ApplyBatchTransfer(component);
-                    serializedObject.Update();
-                }
-            }
-
-            using (new EditorGUI.DisabledScope(_edits.arraySize == 0))
-            {
-                if (GUILayout.Button(DenNormalEditorLocalization.Tr("inspector.btn_spherize_all"), GUILayout.Height(24)))
-                {
-                    serializedObject.ApplyModifiedProperties();
-                    ApplyBatchSpherize(component);
-                    serializedObject.Update();
-                }
-            }
-
-            EditorGUILayout.EndHorizontal();
-        }
-
-        private static void ApplyBatchTransfer(DenNormalEditor component)
-        {
-            if (component == null || component.transferSource == null) return;
-            if (!NormalTransferUtil.ExtractWorldVerticesAndNormals(
-                    component.transferSource, out var srcVertices, out var srcNormals))
-            {
-                return;
-            }
-
-            DenNormalEditorUndo.BeginGroup(component, "Dennoko Normal Editor Transfer");
-
-            foreach (var edit in component.edits)
-            {
-                if (edit?.target == null) continue;
-                var mesh = NormalDeltaApplier.GetSharedMesh(edit.target);
-                if (mesh == null) continue;
-
-                if (!NormalTransferUtil.ExtractWorldVerticesAndNormals(
-                        edit.target, out var dstVertices, out var dstNormals))
-                {
-                    continue;
-                }
-
-                var outWorldNormals = new Vector3[dstVertices.Length];
-                NormalTransferUtil.TransferClosestNormals(
-                    srcVertices, srcNormals, dstVertices, dstNormals, null, outWorldNormals);
-
-                StoreWorldNormalsIntoEdit(edit, mesh, outWorldNormals);
-            }
-
-            DenNormalEditorUndo.Apply(component);
-            DenNormalEditorUndo.EndGroup();
-            LiveEdits.Invalidate();
-            if (EditSession.IsActive(component)) EditSession.Active?.ResyncFromComponent();
-        }
-
-        private static void ApplyBatchSpherize(DenNormalEditor component)
-        {
-            if (component == null) return;
-
-            DenNormalEditorUndo.BeginGroup(component, "Dennoko Normal Editor Spherize");
-
-            foreach (var edit in component.edits)
-            {
-                if (edit?.target == null) continue;
-                var mesh = NormalDeltaApplier.GetSharedMesh(edit.target);
-                if (mesh == null) continue;
-
-                if (!NormalTransferUtil.ExtractWorldVerticesAndNormals(
-                        edit.target, out var dstVertices, out var dstNormals))
-                {
-                    continue;
-                }
-
-                var center = component.spherizeCenter != null
-                    ? component.spherizeCenter.position
-                    : edit.target.bounds.center;
-
-                var outWorldNormals = new Vector3[dstVertices.Length];
-                for (var i = 0; i < dstVertices.Length; i++)
-                {
-                    outWorldNormals[i] = NormalTransferUtil.ComputeSpherizedNormal(
-                        dstVertices[i], center, dstNormals[i], 1f);
-                }
-
-                StoreWorldNormalsIntoEdit(edit, mesh, outWorldNormals);
-            }
-
-            DenNormalEditorUndo.Apply(component);
-            DenNormalEditorUndo.EndGroup();
-            LiveEdits.Invalidate();
-            if (EditSession.IsActive(component)) EditSession.Active?.ResyncFromComponent();
-        }
-
-        private static void StoreWorldNormalsIntoEdit(NormalEdit edit, Mesh mesh, Vector3[] worldNormals)
-        {
-            var dict = new Dictionary<int, Vector3>(worldNormals.Length);
-            NormalTransferUtil.ConvertWorldNormalsToLocalDeltas(edit.target, mesh, worldNormals, dict);
-            edit.SetFrom(dict, mesh.vertexCount);
         }
 
         private void DrawBakeSection(DenNormalEditor component)
