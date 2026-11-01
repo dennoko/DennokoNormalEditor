@@ -491,7 +491,7 @@ namespace Dennokoworks.DenNormalEditor.Editor
             }
 
             var recorded = vertexCountProp.intValue;
-            if (recorded != 0 && recorded != mesh.vertexCount)
+            if (!NormalDeltaApplier.IsVertexCountCompatible(recorded, mesh.vertexCount))
             {
                 EditorGUILayout.HelpBox(
                     DenNormalEditorLocalization.Format("inspector.warn_vertex_count_mismatch", mesh.vertexCount, recorded),

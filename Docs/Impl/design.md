@@ -121,7 +121,7 @@ public class NormalEdit
     const float ZeroThresholdSq = 1e-8f;
 
     public Renderer target;
-    public int vertexCount;             // 編集時の頂点数。不一致なら適用しない
+    public int vertexCount;             // 編集時の頂点数。現在の頂点数より多ければ適用しない
     [SerializeField, HideInInspector] int count;
     [SerializeField, HideInInspector] byte[] blob;
     [SerializeField, HideInInspector] int revision;   // 書き込みのたびに ++
@@ -294,7 +294,7 @@ InPhase(BuildPhase.Transforming)
 ### 4.2 合成規則：`GatherEditsInto`（DME から移植。Filter に置く）
 
 - 同じ Renderer を対象とする全コンポーネントの `edits` を、コンポーネントの順 → edits の順に走査する。
-- `vertexCount` が現在の頂点数と一致しない編集は除外する（ビルド時だけ理由を報告する）。
+- `vertexCount` が現在の頂点数より多い編集は除外する（ビルド時だけ理由を報告する）。末尾への頂点追加（現在の頂点数のほうが多い）は既存インデックスが保たれるので適用する（`NormalDeltaApplier.IsVertexCountCompatible`）。
 - `LiveEdits` に未確定データがある編集は、そちらで置き換える。
 - デルタは**加算**する。正規化は `NormalDeltaApplier.Apply` が 1 回だけ行う。
 - 戻り値は `bool`（適用するものがあるか）だけにする。DME にあった `Single` の分岐は削る。
@@ -702,4 +702,4 @@ AAO などの下流フィルタがメッシュを差し替える構成では、�
 - ボーンに非一様スケールがある場合、ワールド法線の角度がわずかにずれる（§3.2）。往復は一貫しているので、誤差は溜まらない。
 - 結合はセッション開始時のポーズで判定する。セッション中に大きくポーズを変えても結合は作り直さない。
 - 上流のツールが法線を in-place で書き換える場合、その変化は Source インスタンスが変わるまでプレビューに反映されない。
-- 頂点数か頂点順が変わったメッシュ（元メッシュの差し替えなど）では、編集を適用しない（ビルド時に警告する）。
+- 頂点数が減ったメッシュ（元メッシュの差し替えなど）では、編集を適用しない（ビルド時に警告する）。頂点数が同じか増えている場合は検出できないので、頂点順が変わっていれば編集がずれる。

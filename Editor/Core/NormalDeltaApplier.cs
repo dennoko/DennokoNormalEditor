@@ -42,11 +42,23 @@ namespace Dennokoworks.DenNormalEditor.Editor
             }
         }
 
+        /// <summary>
+        /// 編集時の頂点数 <paramref name="recorded"/> の編集データを、頂点数 <paramref name="current"/> のメッシュへ適用できるか。
+        ///
+        /// 頂点が末尾に追加されただけなら既存の頂点インデックスは変わらないため、適用を許可する
+        /// （例: zatools の Convex Depth Wrapper はビルド時に凸包の頂点をメッシュ末尾へ追加する）。
+        /// 頂点数が減った場合はインデックスがずれている可能性があるため適用しない。
+        /// </summary>
+        internal static bool IsVertexCountCompatible(int recorded, int current)
+        {
+            return recorded == 0 || recorded <= current;
+        }
+
         internal static bool IsCompatible(Mesh mesh, NormalEdit edit)
         {
             if (mesh == null || edit == null || !edit.HasEdits) return false;
 
-            if (edit.vertexCount != 0 && edit.vertexCount != mesh.vertexCount) return false;
+            if (!IsVertexCountCompatible(edit.vertexCount, mesh.vertexCount)) return false;
 
             var count = edit.Count;
             for (var i = 0; i < count; i++)

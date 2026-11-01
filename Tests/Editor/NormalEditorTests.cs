@@ -137,6 +137,47 @@ namespace Dennokoworks.DenNormalEditor.Tests
         }
 
         [Test]
+        public void NormalDeltaApplier_CreateEdited_AppliesToMeshWithAppendedVertices()
+        {
+            // 編集時 3 頂点 → 上流ツールが末尾に 1 頂点追加して 4 頂点になったケース（Convex Depth Wrapper など）
+            Assert.IsTrue(NormalDeltaApplier.IsVertexCountCompatible(0, 4));
+            Assert.IsTrue(NormalDeltaApplier.IsVertexCountCompatible(3, 3));
+            Assert.IsTrue(NormalDeltaApplier.IsVertexCountCompatible(3, 4));
+            Assert.IsFalse(NormalDeltaApplier.IsVertexCountCompatible(4, 3));
+
+            var edit = new NormalEdit();
+            edit.SetFrom(new Dictionary<int, Vector3> { [1] = new Vector3(1f, -1f, 0f) }, 3);
+
+            var mesh = new Mesh
+            {
+                vertices = new[] { Vector3.zero, Vector3.right, Vector3.up, Vector3.forward },
+                normals = new[] { Vector3.up, Vector3.up, Vector3.up, Vector3.up },
+            };
+
+            Mesh edited = null;
+            try
+            {
+                edited = NormalDeltaApplier.CreateEdited(mesh, edit);
+                Assert.IsNotNull(edited);
+
+                var normals = edited.normals;
+                Assert.Less((normals[1] - Vector3.right).magnitude, 1e-5f);
+                Assert.Less((normals[0] - Vector3.up).magnitude, 1e-5f);
+                Assert.Less((normals[3] - Vector3.up).magnitude, 1e-5f);
+
+                // 頂点数が減ったメッシュには適用しない
+                var shrunk = new NormalEdit();
+                shrunk.SetFrom(new Dictionary<int, Vector3> { [1] = new Vector3(1f, -1f, 0f) }, 5);
+                Assert.IsNull(NormalDeltaApplier.CreateEdited(mesh, shrunk));
+            }
+            finally
+            {
+                Object.DestroyImmediate(mesh);
+                if (edited != null) Object.DestroyImmediate(edited);
+            }
+        }
+
+        [Test]
         public void SmoothNormalCalculator_CrossMeshSeamWeld_UnifiesNeckBoundaryNormalsBetweenHeadAndBody()
         {
             // Head メッシュ（y = 0..1）と Body メッシュ（y = -1..0）が y = 0 の境界（首の継ぎ目）で接しているケース。

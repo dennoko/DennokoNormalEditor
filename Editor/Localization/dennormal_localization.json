@@ -32,8 +32,8 @@
     },
     {
       "key": "inspector.warn_vertex_count_mismatch",
-      "ja": "頂点数が編集時と異なります（現在 {0} / 編集時 {1}）。編集は適用されません。",
-      "en": "Vertex count differs from when edited (Current: {0} / Edited: {1}). Edits will not be applied."
+      "ja": "頂点数が編集時より少なくなっています（現在 {0} / 編集時 {1}）。編集は適用されません。",
+      "en": "Vertex count is lower than when edited (Current: {0} / Edited: {1}). Edits will not be applied."
     },
     {
       "key": "inspector.btn_edit_end",

@@ -86,6 +86,33 @@ namespace Dennokoworks.DenNormalEditor.Editor
             context.AssetSaver.SaveAsset(edited);
 
             NormalDeltaApplier.SetSharedMesh(target, edited);
+
+            LogAppendedVertices(target, components, sourceMesh.vertexCount);
+        }
+
+        /// <summary>
+        /// 上流のツールがメッシュ末尾へ頂点を追加していた場合に、その旨を記録する（追加分の頂点には編集を適用しない）。
+        /// </summary>
+        private static void LogAppendedVertices(Renderer target, List<DenNormalEditor> components, int vertexCount)
+        {
+            var recorded = 0;
+            foreach (var component in components)
+            {
+                if (component == null || !component.enabled) continue;
+
+                foreach (var edit in component.edits)
+                {
+                    if (edit == null || edit.target != target || !edit.HasEdits) continue;
+                    if (edit.vertexCount > 0 && edit.vertexCount < vertexCount) recorded = Mathf.Max(recorded, edit.vertexCount);
+                }
+            }
+
+            if (recorded == 0) return;
+
+            Debug.Log(
+                $"[Dennoko Normal Editor] {target.name}: 他のツールによりメッシュ末尾へ頂点が追加されています"
+                + $"（現在 {vertexCount} / 編集時 {recorded}）。既存の頂点にのみ法線編集を適用しました。",
+                target);
         }
     }
 }

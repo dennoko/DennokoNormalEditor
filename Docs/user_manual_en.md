@@ -168,7 +168,8 @@ Export the edited mesh to a standalone asset file (`.asset`).
 This tool stores normal delta vectors relative to the **original mesh's vertex indices**. Keep the following in mind:
 
 - **FBX Re-export / Re-import:** Re-exporting from 3D modeling software (e.g., Blender) may change vertex counts or ordering, causing normal edits to misalign.
-- **Safety Safeguard:** If vertex count differs from edit time due to mesh replacement or re-import, **normal edits are automatically skipped** to prevent distortion, and a warning is displayed.
+- **Safety Safeguard:** If the vertex count is lower than at edit time due to mesh replacement or re-import, **normal edits are automatically skipped** to prevent distortion, and a warning is displayed.
+- **Appended Vertices:** If another tool (e.g., zatools Convex Depth Wrapper) appends vertices to the end of the mesh at build time, existing vertex indices are unchanged, so edits are applied to the existing vertices only.
 
 ### Compatibility with Other Tools
 Build processing runs during NDMF's `Transforming` phase (immediately after Modular Avatar).  
@@ -181,8 +182,8 @@ Because it executes before optimizing tools like Avatar Optimizer (AAO), it safe
 ### "NDMF preview not acquired" Warning
 NDMF preview is disabled or has not finished generating. Editing is still possible, but you will be viewing and editing base geometry without effects from upstream tools. Ensure NDMF preview is enabled on the Unity toolbar.
 
-### "Vertex count differs from when edited" Warning
-The base mesh was replaced or re-imported with a different vertex count. Edit application is suspended to protect the model. Click "Clear All Edits" in the Inspector to reset and re-edit.
+### "Vertex count is lower than when edited" Warning
+The base mesh was replaced or re-imported with fewer vertices. Edit application is suspended to protect the model. Click "Clear All Edits" in the Inspector to reset and re-edit.
 
 ### Neck Seam Does Not Smooth Out
 Verify that both Head (Face) and Body are added to the component's **"Targets"** list. Both must be registered so that boundary vertices across separate meshes can be welded and calculated together.

@@ -306,12 +306,12 @@ namespace Dennokoworks.DenNormalEditor.Editor
         private static bool IsApplicable(NormalEdit edit, Renderer target, int vertexCount, List<string> skipped)
         {
             if (edit == null || edit.target != target) return false;
-            if (edit.vertexCount == 0 || edit.vertexCount == vertexCount) return true;
+            if (NormalDeltaApplier.IsVertexCountCompatible(edit.vertexCount, vertexCount)) return true;
 
             if (edit.HasEdits)
             {
                 skipped?.Add(
-                    $"頂点数が編集時と異なるため {edit.Count} 頂点分の法線編集を適用できませんでした"
+                    $"頂点数が編集時より少ないため {edit.Count} 頂点分の法線編集を適用できませんでした"
                     + $"（現在 {vertexCount} / 編集時 {edit.vertexCount}）。");
             }
 
